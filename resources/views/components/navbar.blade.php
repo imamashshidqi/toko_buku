@@ -3,7 +3,7 @@
         <div class="flex h-16 items-center justify-between">
             <div class="flex items-center">
                 <div class="shrink-0">
-                    <img class="size-8" src="..\img\logo-unpak_menu_web.png"
+                    <img class="size-auto w-45" src="{{ asset('storage/img/books/logo.png') }}"
                         alt="TOBUK | Albert Einstein Suka Baca Buku..">
                 </div>
                 <div class="hidden md:block">
