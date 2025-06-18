@@ -18,16 +18,27 @@
                 <div class="ml-4 flex items-center md:ml-6">
 
                     @auth
-                        <button type="button"
+                        {{-- Keranjang notif --}}
+                        <a href="{{ route('keranjang.index') }}"
                             class="relative rounded-full bg-primary-800 p-1 text-primary-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary-500 focus:outline-hidden">
-                            <span class="absolute -inset-1.5"></span>
-                            <span class="sr-only">View notifications</span>
-                            <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                aria-hidden="true" data-slot="icon">
+                            <span class="sr-only">View cart</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="none" class="size-6"
+                                stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                                    d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
                             </svg>
-                        </button>
+
+                            {{-- INI BAGIAN BARU UNTUK NOTIFIKASI --}}
+                            @auth
+                                @if ($cartCount > 0)
+                                    <span
+                                        class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                                        {{ $cartCount }}
+                                    </span>
+                                @endif
+                            @endauth
+                            {{-- AKHIR BAGIAN BARU --}}
+                        </a>
 
                         <!-- Profile dropdown -->
                         <div class="relative ml-3">
