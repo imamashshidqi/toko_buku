@@ -23,6 +23,7 @@ return new class extends Migration
                 indexName: 'books_id_kategori',
             );
             $table->decimal('harga', 10, 2);
+            $table->integer('stok')->default(0);
             $table->decimal('rating')->nullable();
             $table->text('deskripsi')->nullable();
             $table->string('cover_image')->nullable();

@@ -44,6 +44,33 @@ class CartController extends Controller
         return back()->with('success', 'Buku berhasil ditambahkan ke keranjang!');
     }
 
+    public function update(Request $request, Cart $item)
+    {
+        // Pastikan item ini milik user yang sedang login
+        if ($item->user_id !== Auth::id()) {
+            return back()->with('error', 'Aksi tidak diizinkan.');
+        }
+
+        // Validasi action dari form
+        $request->validate([
+            'action' => 'required|in:increase,decrease'
+        ]);
+
+        if ($request->action === 'increase') {
+            $item->increment('quantity');
+        } elseif ($request->action === 'decrease') {
+            if ($item->quantity > 1) {
+                $item->decrement('quantity');
+            } else {
+                // Jika kuantitas 1 dan dikurangi, hapus item dari keranjang
+                $item->delete();
+                return back()->with('success', 'Buku berhasil dihapus dari keranjang.');
+            }
+        }
+
+        return back()->with('success', 'Kuantitas berhasil diperbarui.');
+    }
+
     // Menghapus item dari keranjang
     public function destroy(Cart $keranjang)
     {

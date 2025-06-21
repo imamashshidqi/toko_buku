@@ -17,6 +17,7 @@ class Book extends Model
         'id_penulis',
         'id_kategori',
         'harga',
+        'stok',
         'deskripsi',
         'cover_image',
         'rating',

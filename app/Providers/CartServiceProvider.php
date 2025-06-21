@@ -22,8 +22,7 @@ class CartServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // PASTIKAN 'V' BESAR dan path 'components.navbar' sudah benar
-        View::composer('components.navbar', function ($view) {
+        View::composer(['components.navbar', 'components.navbar-dashboard'], function ($view) {
             $cartCount = 0;
             if (Auth::check()) {
                 $cartCount = Cart::where('user_id', Auth::id())->count();

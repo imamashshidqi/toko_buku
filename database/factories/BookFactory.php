@@ -25,6 +25,7 @@ class BookFactory extends Factory
             'id_penulis' => User::factory(),
             'id_kategori' => Category::factory(),
             'harga' => fake()->numberBetween(5, 100) * 10000,
+            'stok' => fake()->numberBetween(0, 100),
             'rating' => fake()->numberBetween(1, 5),
             'deskripsi' => fake()->paragraph(rand(3, 5)),
             'slug' => Str::slug($judul),

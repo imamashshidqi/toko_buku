@@ -6,6 +6,7 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\DashboardController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
@@ -37,9 +38,17 @@ Route::post('/register', [RegisterController::class, 'store']);
 Route::middleware('auth')->group(function () {
     Route::get('/keranjang', [CartController::class, 'index'])->name('keranjang.index');
     Route::post('/keranjang', [CartController::class, 'store'])->name('keranjang.store');
+    Route::patch('/keranjang/{item}', [CartController::class, 'update'])->name('keranjang.update');
     Route::delete('/keranjang/{keranjang}', [CartController::class, 'destroy'])->name('keranjang.destroy');
 
-    // Pindahkan route dashboard ke sini juga
     Route::resource('/dashboard', DashboardController::class)->middleware('auth')->parameters(['dashboard' => 'book']);
-    Route::post('/logout', [LoginController::class, 'logout']); // Logout juga butuh auth
+    Route::post('/logout', [LoginController::class, 'logout']);
+});
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
+    Route::post('/wishlist/{book}', [WishlistController::class, 'store'])->name('wishlist.store');
+    Route::delete('/wishlist/{book}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
+    Route::post('/wishlist/toggle/{book}', [WishlistController::class, 'toggle'])->middleware('auth')->name('wishlist.toggle');
 });

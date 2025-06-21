@@ -7,6 +7,7 @@ use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Container\Attributes\Storage;
+use Illuminate\Validation\Rule;
 
 class DashboardController extends Controller
 {
@@ -43,6 +44,7 @@ class DashboardController extends Controller
         $validated = $request->validate([
             'judul'       => 'required|max:255',
             'deskripsi'   => 'required',
+            'stok'        => 'required|numeric|min:1',
             'harga'       => 'required|numeric|min:10000',
             'id_penulis'  => 'required|exists:users,id',
             'id_kategori' => 'required|exists:categories,id',
@@ -92,7 +94,7 @@ class DashboardController extends Controller
     public function update(Request $request, Book $book)
     {
         $rules = [
-            'judul'       => 'required|max:255',
+            'judul'     => ['required', 'max:255', Rule::unique('books')->ignore($book->id)],
             'deskripsi'   => 'required',
             'harga'       => 'required|numeric|min:10000',
             'rating'      => 'required|numeric|min:1|max:5',

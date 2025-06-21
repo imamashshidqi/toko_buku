@@ -3,7 +3,7 @@
         <div class="flex h-16 items-center justify-between">
             <div class="flex items-center">
                 <div class="shrink-0">
-                    <img class="size-auto w-45" src="{{ asset('storage/img/books/logo.png') }}"
+                    <img class="size-auto w-45" src="{{ asset('storage/img/books/logo1.png') }}"
                         alt="TOBUK | Albert Einstein Suka Baca Buku..">
                 </div>
                 <div class="hidden md:block">
@@ -49,8 +49,7 @@
                                     <span class="absolute -inset-1.5"></span>
                                     <span class="sr-only">Open user menu</span>
                                     <img class="size-8 rounded-full"
-                                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                        alt="">
+                                        src="{{ asset('storage/img/books/default-profile.jpg') }}" alt="">
                                 </button>
                             </div>
 
@@ -66,6 +65,8 @@
                                     tabindex="-1" id="user-menu-item-0">Sup? {{ Auth::user()->name }}</a>
                                 <a href="/dashboard" class="block px-4 py-2 text-sm text-primary-700" role="menuitem"
                                     tabindex="-1" id="user-menu-item-1">Dashboard</a>
+                                <a href="/wishlist" class="block px-4 py-2 text-sm text-primary-700" role="menuitem"
+                                    tabindex="-1" id="user-menu-item-1">Favorites</a>
                                 <form action="/logout" method="POST"> @csrf <button type="submit"
                                         class="block px-4 py-2 text-sm text-primary-700" role="menuitem" tabindex="-1"
                                         id="user-menu-item-2">Logout</button>

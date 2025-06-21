@@ -1,86 +1,172 @@
 <x-layout>
-    <x-slot:title>{{ $title }}</x-slot:title>
+    <x-slot:title>Keranjang Belanja</x-slot:title>
 
-    <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">Keranjang Belanja Anda</h1>
+    {{-- Initialize totals --}}
+    @php
+        $totalOriginalPrice = 0;
+        $totalDiscountAmount = 0;
+        $subTotal = 0;
+        $totalItems = $cartItems->sum('quantity');
+    @endphp
 
-        @if (session('success'))
-            <div class="mt-4 rounded-md bg-green-100 p-4 text-green-700">
-                {{ session('success') }}
-            </div>
-        @endif
+    <div class="bg-gray-100 min-h-screen p-4 sm:p-6 lg:p-8">
+        <div class="mx-auto max-w-7xl">
+            <div class="grid grid-cols-1 lg:grid-cols-3 lg:gap-8">
 
-        @if (session('error'))
-            <div class="mt-4 rounded-md bg-red-100 p-4 text-red-700">
-                {{ session('error') }}
-            </div>
-        @endif
+                {{-- Left Column: Cart Items --}}
+                <section class="lg:col-span-2">
+                    <ul class="space-y-4">
+                        @forelse ($cartItems as $item)
+                            @php
+                                // ... (blok kalkulasi Anda tetap sama)
+                                $hasDiscount = $item->book->harga < $item->book->harga_sebelum_diskon;
+                                $originalPricePerItem = $item->book->harga_sebelum_diskon;
+                                $finalPricePerItem = $item->book->harga;
+                                $lineItemOriginalTotal = $originalPricePerItem * $item->quantity;
+                                $lineItemFinalTotal = $finalPricePerItem * $item->quantity;
+                                $lineItemDiscount = $lineItemOriginalTotal - $lineItemFinalTotal;
 
-        <div class="mt-8">
-            <div class="flow-root">
-                <ul role="list" class="-my-6 divide-y divide-gray-200">
-                    @php $totalPrice = 0; @endphp
-                    @forelse ($cartItems as $item)
-                        <li class="flex py-6">
-                            <div class="h-24 w-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                @if ($item->book->cover_image)
-                                    <img src="{{ asset('storage/' . $item->book->cover_image) }}"
-                                        class="h-full w-full object-cover object-center">
-                                @else
-                                    <img src="{{ asset('storage/img/books/Avenger Endgame.jpeg') }}" alt="No image"
-                                        class="mx-auto h-full rounded dark:hidden">
-                                @endif
-                            </div>
+                                $totalOriginalPrice += $lineItemOriginalTotal;
+                                $totalDiscountAmount += $lineItemDiscount;
+                                $subTotal += $lineItemFinalTotal;
+                            @endphp
 
-                            <div class="ml-4 flex flex-1 flex-col">
-                                <div>
-                                    <div class="flex justify-between text-base font-medium text-gray-900">
-                                        <h3>
-                                            <a href="/books/{{ $item->book->slug }}">{{ $item->book->judul }}</a>
-                                        </h3>
-                                        <p class="ml-4">
-                                            Rp{{ number_format($item->book->harga * $item->quantity, 0, ',', '.') }}</p>
-                                    </div>
-                                    <p class="mt-1 text-sm text-gray-500">{{ $item->book->penulis->nama }}</p>
+                            <li class="bg-white rounded-xl shadow p-4 flex flex-col sm:flex-row gap-4">
+                                {{-- Image --}}
+                                <div class="w-24 h-36 flex-shrink-0 mx-auto sm:mx-0">
+                                    @if ($item->book->cover_image)
+                                        <img src="{{ asset('storage/' . $item->book->cover_image) }}"
+                                            alt="{{ $item->book->judul }}" class="h-full w-full object-cover rounded-md">
+                                    @else
+                                        <img src="{{ asset('storage/img/books/Book1.jpg') }}" alt="No image"
+                                            class="h-full w-full object-cover rounded-md">
+                                    @endif
                                 </div>
-                                <div class="flex flex-1 items-end justify-between text-sm">
-                                    <p class="text-gray-500">Qty {{ $item->quantity }}</p>
 
-                                    <div class="flex">
-                                        <form action="{{ route('keranjang.destroy', $item->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                class="font-medium text-primary-600 hover:text-primary-500">Remove</button>
-                                        </form>
+                                {{-- Item Details --}}
+                                <div class="flex-grow flex flex-col sm:flex-row gap-4">
+                                    {{-- Info: Title, Price, Quantity --}}
+                                    <div class="flex-grow">
+                                        <span
+                                            class="text-xs bg-gray-200 {{ $item->book->category->color ?? 'bg-gray-600' }} font-medium px-2 py-1 rounded-full">{{ $item->book->category->name ?? 'Umum' }}</span>
+                                        <a href="/books/{{ $item->book->slug }}">
+                                            <h3 class="text-lg font-bold text-gray-800 mt-2">{{ $item->book->judul }}
+                                            </h3>
+                                        </a>
+                                        @if ($hasDiscount)
+                                            {{-- Tampilan harga diskon Anda --}}
+                                        @else
+                                            <p class="text-xl font-bold text-gray-800 mt-1">
+                                                Rp{{ number_format($finalPricePerItem, 0, ',', '.') }}</p>
+                                        @endif
+
+                                        <div class="flex items-center mt-4">
+                                            {{-- Quantity Selector --}}
+                                            <div class="flex items-center border border-gray-200 rounded-lg w-fit">
+                                                {{-- Tombol Kurang (-) --}}
+                                                <form action="{{ route('keranjang.update', $item->id) }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <input type="hidden" name="action" value="decrease">
+                                                    <button type="submit"
+                                                        class="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-100 rounded-l-lg">-</button>
+                                                </form>
+
+                                                <span
+                                                    class="px-4 py-1 font-semibold text-center w-12">{{ $item->quantity }}</span>
+
+                                                {{-- Tombol Tambah (+) --}}
+                                                <form action="{{ route('keranjang.update', $item->id) }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <input type="hidden" name="action" value="increase">
+                                                    <button type="submit"
+                                                        class="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-100 rounded-r-lg">+</button>
+                                                </form>
+                                            </div>
+
+                                            {{-- Tombol Hapus --}}
+                                            <form action="{{ route('keranjang.destroy', $item->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    class="text-sm ms-4 font-medium text-red-600 hover:text-red-800 flex items-center gap-1">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                        </path>
+                                                    </svg>
+                                                    Hapus
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    {{-- Price Breakdown --}}
+                                    <div
+                                        class="flex-shrink-0 flex sm:flex-col justify-around sm:justify-start gap-2 text-center">
+                                        <div class="bg-gray-100 p-2 rounded-md w-full">
+                                            <p class="text-xs text-gray-500">Harga Buku
+                                            </p>
+                                            <p class="font-semibold text-sm">
+                                                Rp{{ number_format($item->book->harga, 0, ',', '.') }}</p>
+                                        </div>
+                                        <div class="bg-gray-100 p-2 rounded-md w-full">
+                                            <p class="text-xs text-gray-500">Total Harga</p>
+                                            <p class="font-bold text-base">
+                                                Rp{{ number_format($lineItemFinalTotal, 0, ',', '.') }}</p>
+                                        </div>
                                     </div>
                                 </div>
+                            </li>
+                        @empty
+                            <div class="bg-white rounded-xl shadow p-8 text-center">
+                                <p class="text-gray-500">Keranjang belanja Anda kosong.</p>
+                                <a href="/books"
+                                    class="mt-4 inline-block font-medium text-indigo-600 hover:text-indigo-500">
+                                    Mulai Belanja &rarr;
+                                </a>
                             </div>
-                        </li>
-                        @php $totalPrice += $item->book->harga * $item->quantity; @endphp
-                    @empty
-                        <div class="text-center py-10">
-                            <p class="text-gray-500">Keranjang belanja Anda kosong.</p>
-                            <a href="/books" class="mt-4 inline-block text-primary-600 hover:text-primary-500">Mulai
-                                Belanja &rarr;</a>
+                        @endforelse
+                    </ul>
+                </section>
+
+                {{-- Right Column: Cart Summary --}}
+                <aside class="lg:col-span-1 mt-8 lg:mt-0">
+                    <div class="bg-white rounded-xl shadow sticky top-8">
+                        <div class="bg-primary-700 text-white p-4 rounded-t-xl">
+                            <h2 class="font-bold text-lg">Ringkasan Keranjang</h2>
                         </div>
-                    @endforelse
-                </ul>
+                        <div class="p-4 space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <p class="text-gray-600">Total Harga ({{ $totalItems }} Barang)</p>
+                                <p class="font-medium">Rp{{ number_format($subTotal, 0, ',', '.') }}</p>
+                            </div>
+                            <div class="flex justify-between">
+                                <p class="text-gray-600">Total Diskon Belanja</p>
+                                <p class="font-medium text-red-600">
+                                    -Rp.0</p>
+                            </div>
+                            <hr>
+                            <div class="flex justify-between text-base font-bold">
+                                <p>SubTotal</p>
+                                <p>Rp{{ number_format($subTotal, 0, ',', '.') }}</p>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <button
+                                class="w-full bg-primary-700 text-white font-bold py-3 rounded-lg hover:bg-primary-600 transition-colors">
+                                Checkouts
+                            </button>
+                        </div>
+                    </div>
+                </aside>
+
             </div>
         </div>
-
-        @if ($cartItems->isNotEmpty())
-            <div class="border-t border-gray-200 px-4 py-6 sm:px-6 mt-8">
-                <div class="flex justify-between text-base font-medium text-gray-900">
-                    <p>Subtotal</p>
-                    <p>Rp{{ number_format($totalPrice, 0, ',', '.') }}</p>
-                </div>
-                <p class="mt-0.5 text-sm text-gray-500">Biaya pengiriman akan dihitung saat checkout.</p>
-                <div class="mt-6">
-                    <a href="#"
-                        class="flex items-center justify-center rounded-md border border-transparent bg-primary-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-primary-700">Checkout</a>
-                </div>
-            </div>
-        @endif
     </div>
 </x-layout>

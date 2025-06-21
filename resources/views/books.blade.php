@@ -1,6 +1,30 @@
 <x-layout>
     <x-slot:title>{{ $title }}</x-slot:title>
-    <h1></h1>
+    @if (session()->has('success'))
+        <div id="alert-3"
+            class="flex items-center p-4 mb-4 text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400"
+            role="alert">
+            <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                viewBox="0 0 20 20">
+                <path
+                    d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span class="sr-only">Info</span>
+            <div class="ms-3 text-sm font-medium">
+                {{ session('success') }}
+            </div>
+            <button type="button"
+                class="ms-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-green-400 p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-green-400 dark:hover:bg-gray-700"
+                data-dismiss-target="#alert-3" aria-label="Close">
+                <span class="sr-only">Close</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                </svg>
+            </button>
+        </div>
+    @endif
     <div class="py-4 px-4 mx-auto max-w-screen-xl lg:px-6">
 
         <form class="mb-8 max-w-md mx-auto">
@@ -84,8 +108,8 @@
                         Filters
                         <svg class="-me-0.5 ms-2 h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                             width="24" height="24" fill="none" viewBox="0 0 24 24">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m19 9-7 7-7-7" />
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="m19 9-7 7-7-7" />
                         </svg>
                     </button>
                     <button id="sortDropdownButton1" data-dropdown-toggle="dropdownSort1" type="button"
@@ -140,8 +164,8 @@
                                         <img src="{{ asset('storage/' . $book->cover_image) }}"
                                             alt="{{ $book->judul }}" class="mx-auto h-full rounded dark:hidden">
                                     @else
-                                        <img src="{{ asset('storage/img/books/Avenger Endgame.jpeg') }}"
-                                            alt="No image" class="mx-auto h-full rounded dark:hidden">
+                                        <img src="{{ asset('storage/img/books/book1.jpg') }}" alt="No image"
+                                            class="mx-auto h-full rounded dark:hidden">
                                     @endif
                                 </a>
                             </div>
@@ -153,7 +177,7 @@
                                 </div>
 
                                 <a href="/books/{{ $book['slug'] }}"
-                                    class="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white">{{ Str::limit($book['judul'], 35) }}</a>
+                                    class="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white">{{ Str::limit($book['judul'], 40) }}</a>
 
                                 <div class="mt-2 flex items-center gap-2">
                                     <div class="flex items-center">
@@ -181,8 +205,8 @@
                                 </div>
 
                                 <div class="mt-4 flex items-center justify-between gap-4">
-                                    <p class="text-sm font-extrabold leading-tight text-gray-900 dark:text-white">Rp.
-                                        {{ $book['harga'] }}
+                                    <p class="text-sm font-sm leading-tight text-gray-900 dark:text-white">
+                                        Rp.{{ $book['harga'] }}
                                     </p>
                                     <form action="{{ route('keranjang.store') }}" method="POST">
                                         @csrf
